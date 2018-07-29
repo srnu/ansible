@@ -1,0 +1,9 @@
+[ubuntu]
+localhost
+ip-172-31-95-124.ec2.internal
+
+[RedHat]
+ip-172-31-19-13.ec2.internal
+
+[webserver]
+localhost
