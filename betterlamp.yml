@@ -1,0 +1,39 @@
+---
+- hosts: all
+  become: yes  
+  tasks:
+  - name: Load a variable file based on the OS type, or a default if not found. Using free-form to specify the file.
+    include_vars: 
+      dir: 'group_vars'
+      files_matching: "{{ item }}"
+      depth: 1
+    with_items:
+      - "ubuntu.yml"
+      - "redhat.yml"
+  - name: install apache server
+    package:
+      name: " {{ pack_name }}"
+      state: present
+    notify:
+    - restart apache
+    when: ansible_distribution == 'ubuntu' or ansible_distribution == 'RedHat'
+  - name: install php packages
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items: "{{ php_packages }}"
+    notify:
+    - restart apache
+    when: ansible_distribution == 'ubuntu' or ansible_distribution == 'RedHat'
+  - name: download web page
+    get_url:
+      url: https://raw.githubusercontent.com/asquarezone/AnsibleZone/master/ClassRoomExamples/July2018/basics/info.php
+      dest: /var/www/html/info.php
+    notify:
+    - restart apache
+  handlers:
+  - name: restart apache
+    service: 
+      name: "{{ pack_name }}"
+      state: restarted
+
